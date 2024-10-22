@@ -5,6 +5,7 @@ fn main() !void {
     var serial = try arch.serial.Kwriter.init();
     try logger.setGlobalWriter(serial.writer());
     logger.info("Hello, World!", .{});
+    try arch.setup();
 }
 
 export fn _start() callconv(.C) noreturn {

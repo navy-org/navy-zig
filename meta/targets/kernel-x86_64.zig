@@ -14,9 +14,17 @@ pub fn getBuildTarget() std.zig.CrossTarget {
     return target;
 }
 
-pub fn addBuildOption(b: *std.Build, kernel: *std.Build.Step.Compile) void {
+pub fn addBuildOption(b: *std.Build, kernel: *std.Build.Step.Compile, modules: std.StringHashMap(*std.Build.Module)) void {
     const arch = b.createModule(.{ .root_source_file = b.path("src/kernel/archs/x86_64/mod.zig") });
     kernel.root_module.addImport("arch", arch);
 
+    var it = modules.keyIterator();
+
+    while (it.next()) |key| {
+        const module = modules.get(key.*);
+        arch.addImport(key.*, module.?);
+    }
+
     kernel.setLinkerScriptPath(b.path("meta/targets/kernel-x86_64.ld"));
+    kernel.addAssemblyFile(b.path("src/kernel/archs/x86_64/helper.s"));
 }

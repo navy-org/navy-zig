@@ -36,5 +36,9 @@ clean:
 	@zig clean
 
 .PHONY: nuke
-nuke: clean
+nuke: $(clean)
 	rm -rf $(SYSROOT)
+
+.PHONY: path
+path:
+	@echo $(KERNEL)

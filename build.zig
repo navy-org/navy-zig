@@ -58,15 +58,20 @@ pub fn build(b: *std.Build) !void {
         .code_model = .kernel,
     });
 
+    var modules = std.StringHashMap(*std.Build.Module).init(b.allocator);
+    defer modules.deinit();
+
     for (liblist.items) |lib| {
         const libname = getFileName(b, lib.root_source_file.?.dirname().src_path.sub_path);
+        try modules.put(libname, lib);
         kernel.root_module.addImport(libname, lib);
     }
 
     const limine = b.dependency("limine", .{});
     kernel.root_module.addImport("limine", limine.module("limine"));
+    try modules.put("limine", limine.module("limine"));
 
-    arch.addBuildOption(b, kernel);
+    arch.addBuildOption(b, kernel, modules);
     kernel.want_lto = false;
 
     b.installArtifact(kernel);

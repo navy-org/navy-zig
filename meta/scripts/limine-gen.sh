@@ -13,8 +13,8 @@ if [ ! -d $img ]; then
     exit 1
 fi
 
-if [ ! -f $img/efi/boot/kernel.elf ]; then
-    echo "Error: $img/boot/kernel.elf not found"
+if [ ! -f $img/kernel.elf ]; then
+    echo "Error: $img/kernel.elf not found"
     exit 1
 fi
 
