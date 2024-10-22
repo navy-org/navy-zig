@@ -33,12 +33,16 @@ qemu: $(LOADER) $(KERNEL) $(FIRMWARE)
 
 .PHONY: clean
 clean:
-	@zig clean
+	rm -rf ./zig-cache/ ./zig-out/
 
 .PHONY: nuke
-nuke: $(clean)
+nuke: clean
 	rm -rf $(SYSROOT)
 
 .PHONY: path
 path:
 	@echo $(KERNEL)
+
+.PHONY: addr2line
+addr2line: $(KERNEL)
+	@bash ./meta/scripts/addr2line.sh $(KERNEL) $(A)

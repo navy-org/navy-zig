@@ -72,6 +72,7 @@ pub fn build(b: *std.Build) !void {
     try modules.put("limine", limine.module("limine"));
 
     arch.addBuildOption(b, kernel, modules);
+
     kernel.want_lto = false;
 
     b.installArtifact(kernel);

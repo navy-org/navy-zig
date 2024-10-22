@@ -4,7 +4,7 @@ const logger = @import("logger");
 extern fn gdt_flush(addr: u64) void;
 extern fn tss_flush() void;
 
-const GdtType = enum(u3) {
+pub const GdtType = enum(u3) {
     Null = 0,
     KernelCode = 1,
     KernelData = 2,
@@ -112,18 +112,19 @@ const GdtDescriptor = packed struct {
     limit: u16,
     base: u64,
 
-    pub fn load(self: *Self, _gdt: *Gdt) void {
-        self.limit = @intCast(@sizeOf(Gdt) - 1);
-        self.base = @intFromPtr(_gdt);
+    pub fn load(_gdt: *Gdt) Self {
+        return .{
+            .limit = @intCast(@sizeOf(Gdt) - 1),
+            .base = @intFromPtr(_gdt),
+        };
     }
 
-    pub fn apply(self: *Self) void {
+    pub fn apply(self: *const Self) void {
         gdt_flush(@intFromPtr(self));
     }
 };
 
 var gdt: Gdt = std.mem.zeroes(Gdt);
-var desc: GdtDescriptor = std.mem.zeroes(GdtDescriptor);
 
 pub fn setup() void {
     gdt.entries[@intFromEnum(GdtType.Null)] = std.mem.zeroes(GdtEntry);
@@ -135,8 +136,8 @@ pub fn setup() void {
 
     gdt.tss = TssEntry.from_addr(0);
 
-    desc.load(&gdt);
-    desc.apply();
+    GdtDescriptor.load(&gdt).apply();
+
     tss_flush();
     logger.debug("Gdt loaded", .{});
 }

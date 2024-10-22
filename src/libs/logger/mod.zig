@@ -32,7 +32,10 @@ fn createLogger(comptime level: Level) fn (comptime []const u8, anytype) void {
         fn handler(comptime fmt: []const u8, args: anytype) void {
             const writer = global_writer orelse unreachable;
 
-            writer.print("{s}{s}\x1B[0m ", .{ level.getAnsi(), level.getPrefix() }) catch {};
+            if (level != .NONE) {
+                writer.print("{s}{s}\x1B[0m ", .{ level.getAnsi(), level.getPrefix() }) catch {};
+            }
+
             writer.print(fmt, args) catch {};
             _ = writer.write("\n") catch 0;
         }
