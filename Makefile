@@ -16,12 +16,15 @@ $(LOADER):
 
 $(KERNEL): $(SRC)
 	@$(MKCWD)
-	@zig build
+	@zig build -Doptimize=ReleaseFast
 	@cp ./zig-out/bin/kernel.elf $@
 
 $(FIRMWARE):
 	@$(MKCWD)
 	@curl -L https://retrage.github.io/edk2-nightly/bin/RELEASEX64_OVMF.fd -o $@
+
+.PHONY: build
+build: $(KERNEL)
 
 .PHONY: qemu
 qemu: $(LOADER) $(KERNEL) $(FIRMWARE)
